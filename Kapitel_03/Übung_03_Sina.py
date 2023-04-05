@@ -44,10 +44,13 @@ class Punkt(Figur):            #in Klammer Vererbung -> Punkt ist Vererbung von 
     def __init__(self, x, y):
         super().__init__("Punkt")
         self.x = x
-        self.y = y   
+        self.y = y 
+
+    def distanz(self, other):
+        return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
 
     def __str__(self):
-        return f"Punkt({self.x}, {self.y})"
+        return f"Punkt(x = {self.x}, y = {self.y})"
 
 
 class Kreis(Figur):            #in Klammer Vererbung -> Kreis ist Vererbung von Figur
@@ -65,36 +68,53 @@ class Kreis(Figur):            #in Klammer Vererbung -> Kreis ist Vererbung von 
     def __str__(self):
         return f"Kreis Mittelpunkt = {self.mittelpunkt}, r = {self.radius}"
   
+class Dreieck(Figur):            
+    def __init__(self, A, B, C):
+        super().__init__("Dreieck")
+        self.A = A
+        self.B = B
+        self.C = C
 
+    def umfang (self):
+        return self.A.distanz(self.B) + self.B.distanz(self.C) + self.C.distanz(self.A)
+    
+    def __str__(self):
+        return f"Dreieck Punkte = {self.A}, {self.B}, {self.C}"
 
 class Rechteck(Figur):            
-    def __init__(self, point1, point2):
+    def __init__(self, Pmin, Pmax):
         super().__init__("Rechteck")
-        self.point1 = point1
-        self.point2 = point2
-        self.side1 = abs(point1.x - point2.x)  #Länge des Rechtecks
-        self.side2 = abs(point1.y - point2.y)  #Breite des Rechtecks
+        self.Pmin = Pmin
+        self.Pmax = Pmax
 
     def umfang (self):
-        return self.side1 * 2 + self.side2 *2 
+        return 2*abs(self.Pmax.x - self.Pmin.x) + 2*abs(self.Pmax.y - self.Pmin.y)
+        
     
     def __str__(self):
-        return f"Rechteck Punkte = {self.point1}, {self.point2}, Länge = {self.side1}, Breite = {self.side2}"
+        return f"Rechteck Punkte = {self.Pmin}, {self.Pmax}"
     
-class Polygon(Figur):            
-    def __init__(self, mittelpunkt, radius):
-        super().__init__("Kreis")
-        self.mittelpunkt = mittelpunkt
-        self.radius = radius
 
-    def flaeche (self):
-        return self.radius**2 * math.pi
-    
-    def umfang (self):
-        return self.radius*2 * math.pi
-    
+class Polygon(Figur):
+    def __init__(self, Punktliste:
+        super().__init__("Polygon")
+        self.pl = Punktliste
+
+    def umfang(self):
+        s = 0
+        for i in range (0, len(self.pl)-1):
+            l1 = self.pl[i]
+            l2 = self.pl[i+1]
+            s = s + l1.distanz(l2)
+        return s
+        
+
     def __str__(self):
-        return f"Kreis Mittelpunkt = {self.mittelpunkt}, r = {self.radius}"
+        s = f"Polygon: "
+        for punkt in self.pl:
+            s = s + f"{punkt}"
+        return s
+    
 
 
 
@@ -106,6 +126,13 @@ print(k1)
 print(k1.flaeche())
 print(k1.umfang())
 
+#Dreieck austesten
+A = (-2,-2)
+B = (3,-1)
+C = (-1,3)
+d1 = Dreieck(A,B,C)
+print(d1)
+print(d1.umfang())
 
 
 #Rechteck austesten
@@ -115,4 +142,10 @@ r1 = Rechteck(D,E)
 print(r1)
 print(r1.umfang())
 
+
 #Polygon austesten
+polygonliste = [Punkt(1,1), Punkt(2,4), Punkt(3,3.4), Punkt(4,4), Punkt(4,1), Punkt(1,1)]
+
+p1 = Polygon(polygonliste)
+print(p1)
+print(p1.umfang())
