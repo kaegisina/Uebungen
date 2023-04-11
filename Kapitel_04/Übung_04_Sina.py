@@ -1,63 +1,54 @@
-#Erstellen Sie eine Applikation mit folgendem GUI:
-#a) Implementieren Sie das GUI wie abgebildet, wählen Sie ein geeignetes Layout
-#b) Ein File-Menu mit den Einträgen Save und Quit soll hinzugefügt werden
-#c) wird auf den Button "Save" gedrückt, so wird ein File output.txt angelegt, welches 
-#die Daten kommagetrennt speichert, also für oberes Beispiel wäre der Inhalt:
-#Bernhard,Müller,6/25/1986,Gründenstrasse 40,4132,Muttenz,Schweiz
-#d) Beim Betätigen des "Quit" Menus wird das Programm beendet
-#e) Beim Betätigen des "Save" Menus wird der Datensatz wie in c) gespeichert.
-#Hinweis 1: Die QComboBox (Auswahl Land) kann folgendermassen erstellt werden:
-#countries = QComboBox()
-#countries.addItems(["Schweiz", "Deutschland", "Österreich"])
-
 import sys
-import os
-from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
-class Fenster(QMainWindow):
+class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-    def createLayout(self):
-        self.setWindowTitle("GUI-Programmierung")
+        self.setWindowTitle("GUI - Programierung")
 
         #layout erzeugen
+        #layout = ... # QVBoxLayout(), QHBoxLayout(), QGridlayout(), QFormLayout()...
         layout = QFormLayout()
 
-        #Widget-Instanzen erstellen:
-        self.vornameLineEdit = QLineEdit()
-        self.nachnameLineEdit = QLineEdit()
-        self.geburtstag = QDateEdit()
-        self.save = QPushButton("Save")
-        self.adresseLineEdit = QLineEdit()
-        self.plzLineEdit = QLineEdit()
-        self.ortLineEdit = QLineEdit()
-        self.landcombobox = QComboBox()
-        self.landcombobox.addItems(["Schweiz", "Österreich", "Deutschland"])
-     
-        #gui Elemente dem Layout hinzufügen
-        layout.addRow("Vorname:", self.vornameLineEdit)
-        layout.addRow("Name:", self.nachnameLineEdit)
-        layout.addRow("Geburtstag:", self.geburtstag)
-        layout.addRow("Adresse:", self.adresseLineEdit)
-        layout.addRow("Postleitzahl:", self.plzLineEdit)
-        layout.addRow("Ort:", self.ortLineEdit)
-        layout.addRow("Land:", self.landcombobox)
-        layout.addRow(self.save)
+        #gui Elemente erstellen------------------------------------------------
+        self.Vorname = QLineEdit()
+        self.Name = QLineEdit()
+        self.Geburtstag = QDateEdit()
+        self.Adresse = QLineEdit()
+        self.Postleizahl = QLineEdit()
+        self.Ort = QLineEdit()
+        self.Land = QComboBox()
+        self.Button = QPushButton("Save")
 
-        #file hinzufügen:
+        self.Land.addItems(["Schweiz", "Deutschland", "Österreich"])
+    
+
+        #gui Elemente dem Layout hinzufügen------------------------------------
+        layout.addRow("Vorname:", self.Vorname)
+        layout.addRow("Name:", self.Name)
+        layout.addRow("Geburtstag:", self.Geburtstag)
+        layout.addRow("Adresse:", self.Adresse)
+        layout.addRow("Postleizahl:", self.Postleizahl)
+        layout.addRow("Ort:", self.Ort)
+        layout.addRow("Land:", self.Land)
+        layout.addRow(self.Button)
+
+        #Menubar:--------------------------------------------------------------
         menubar = self.menuBar()
-        filemenu = menubar.addMenu("File")
+        file = menubar.addMenu("File")
 
-        save = QAction("Save", self)
-        save.triggered.connect(self.menu_save)
-        quit = QAction("Quit", self)
-        quit.triggered.connect(self.menu_quit)
+        self.save = QAction("Save", self)
+        self.quit = QAction("Quit", self)
 
-        filemenu.addAction(save)
-        filemenu.addAction(quit)
+        file.addAction(self.save)
+        file.addAction(self.quit) 
 
+        # Button Connection----------------------------------------------------     
+        self.Button.clicked.connect(self.textFile)
+        self.save.triggered.connect(self.textFile)
+        self.quit.triggered.connect(self.close)
 
         center = QWidget()
         center.setLayout(layout)
@@ -65,17 +56,29 @@ class Fenster(QMainWindow):
         self.setCentralWidget(center)
 
         self.show()
-    
-    def createConnects(self):
-        self.save.clicked.connect(self.menu_save)
-    
-    def speichern(self):
-        file = open("Ausgabe.txt", "w", encoding ="utf-8")
-        file.write(f"{self.vornameLineEdit.text()}, {self.nachnameLineEdit.text()}, {self.geburtstag.text()}, {self.adresseLineEdit.text()}, {self.plzLineEdit.text()}, {self.ortLineEdit.text()}, {self.landcombobox.currentText()}")
+
+    # Text File:----------------------------------------------------------------    
+    def textFile(self):
+        g = self.Geburtstag.date().toString("dd.MM.yyyy") # .date().toString("dd.MM.yyyy") um das format zu definieren
+        text = f"{self.Vorname.text()},{self.Name.text()},{g},{self.Adresse.text()},{self.Postleizahl.text()},{self.Ort.text()},{self.Land.currentText()}"
+        file = open("output.txt.", "w",encoding = "utf-8")  
+
+        file.write(text)
+
         file.close()
+        print("Die Daten wurden mit erfolg gespeichert")
+    def close(self):
+        self.close()
 
+    #--------------------------------------------------------------------------
 
+    
 
-app = QApplication([])
-win = Fenster()
-app.exec()
+def main():
+    app = QApplication(sys.argv)  # Qt Applikation erstellen
+    mainwindow = MyWindow()       # Instanz Fenster erstellen
+    mainwindow.raise_()           # Fenster nach vorne bringen
+    app.exec_()                   # Applikations-Loop starten
+
+if __name__ == '__main__':
+    main()
